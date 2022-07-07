@@ -10,49 +10,50 @@ namespace BookStore.Controllers
     [ApiController]  // Handle the Client error, Bind the Incoming data with parameters using more attribute
     [Route("[controller]")]
 
-    public class OrderController : Controller
+    public class FeedbackController : Controller
     {
-        private readonly IOrderBL orderBL;
+        private readonly IFeedbackBL feedbackBL;
 
-        public OrderController(IOrderBL orderBL)
+        public FeedbackController(IFeedbackBL feedbackBL)
         {
-            this.orderBL = orderBL;
+            this.feedbackBL = feedbackBL;
         }
 
         [Authorize(Roles = Role.User)]
-        [HttpPost("AddOrder")]
-        public IActionResult AddOrder(OrderModel orderModel)
+        [HttpPost("AddFeedback")]
+        public IActionResult AddFeedback(FeedbackModel feedbackModel)
         {
             try
             {
                 int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var cartData = this.orderBL.AddOrder(orderModel, userId);
+                var cartData = this.feedbackBL.AddFeedback(feedbackModel, userId);
                 if (cartData != null)
                 {
-                    return this.Ok(new { success = true, message = "Order Added SuccessFully", response = cartData });
+                    return this.Ok(new { success = true, message = "Feedback Added SuccessFully", response = cartData });
                 }
                 else
                 {
-                    return this.BadRequest(new { Success = false, message = "Order Failed" });
+                    return this.BadRequest(new { Success = false, message = "Feedback Failed" });
                 }
             }
             catch (Exception ex)
             {
                 return this.BadRequest(new { Success = false, response = ex.Message });
             }
+
         }
 
         [Authorize(Roles = Role.User)]
-        [HttpGet("GetAllOrder")]
-        public IActionResult GetAllOrder()
+        [HttpGet("GetFeedback/{BookId}")]
+        public IActionResult GetFeedback(int BookId)
         {
             try
             {
-                int userId = Convert.ToInt32(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-                var cartData = this.orderBL.GetAllOrder(userId);
+
+                var cartData = this.feedbackBL.GetFeedback(BookId);
                 if (cartData != null)
                 {
-                    return this.Ok(new { success = true, message = "Order List fetched successful ", response = cartData });
+                    return this.Ok(new { success = true, message = "Feedback List fetched successful ", response = cartData });
                 }
                 else
                 {
@@ -64,8 +65,6 @@ namespace BookStore.Controllers
                 return this.BadRequest(new { Success = false, response = ex.Message });
             }
         }
-
-
 
     }
 }
